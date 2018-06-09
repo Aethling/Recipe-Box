@@ -12,8 +12,7 @@ import FormControl from 'react-bootstrap/lib/FormControl';
 class App extends Component {
 
   state = {
-    activeKey: "1",
-    recipes: [
+   recipes: [
       {
         recipeName: "tacos",
         ingredients: ["beans", "onion", "broccoli"]
@@ -27,20 +26,22 @@ class App extends Component {
         ingredients : ["tendon", "blood", "muscle"]
       }
     ]
-  }
-  handleSelect(activeKey){
-    this.setState({ activeKey });
-  }
+  };
+  deleteRecipeAt = index => { 
+    let recipes = this.state.recipes.slice();
+    recipes.splice(index, 1);
+    this.setState({recipes});
+    };
+  
   render() {
     const {recipes} = this.state;
     return (
       <div className="App container">
        <PanelGroup accordion
-                    id="accordionControlled" 
-                    
+                    id="accordion" 
                 >
           {recipes.map((recipe, index) =>(
-            <Panel eventKey={index}>
+            <Panel eventKey={index} key={index}>
               <Panel.Heading>
                 <Panel.Title toggle>{recipe.recipeName}</Panel.Title>
               </Panel.Heading>
@@ -51,13 +52,15 @@ class App extends Component {
                 ))}
                 </ul>
                 <ButtonToolbar>
-                  <Button bsStyle="danger">Delete Recipe</Button>
+                  <Button bsStyle="danger" onClick={()=>this.deleteRecipeAt(index)}>Delete Recipe</Button>
                   <Button bsStyle="default">Edit Recipe</Button>
                 </ButtonToolbar>
               </Panel.Body>
             </Panel>
           ))}
-        </PanelGroup>      </div>
+        </PanelGroup>
+        <Button bsStyle="primary">Add Recipe</Button>
+      </div>
     );
   }
 }
