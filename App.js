@@ -17,8 +17,9 @@ class App extends Component {
     showEdit: false,
     currentIndex: 0,
     newestRecipe: {recipeName: "", ingredients: []},
-    recipes: [
-      {
+    recipes: 
+    [
+     /* {
         recipeName: "tacos",
         ingredients: ["beans", "onion", "broccoli"]
       },
@@ -29,7 +30,7 @@ class App extends Component {
       {
         recipeName: "arm",
         ingredients : ["tendon", "blood", "muscle"]
-      }
+      }*/
     ]
   };
   //deletes a recipe
@@ -67,13 +68,13 @@ class App extends Component {
     this.close();
   }
   //updates recipe name
-  updatesRecipeName = (recipeName, currentIndex) => {
+  updateRecipeName = (recipeName, currentIndex) => {
     let recipes = this.state.recipes.slice();
     recipes[currentIndex] = {recipeName: recipeName, ingredients: recipes[currentIndex].ingredients};
     this.setState({recipes});
   }
   //updates ingredients
-  updatesIngredients = (ingredients, currentIndex) => {
+  updateIngredients = (ingredients, currentIndex) => {
     let recipes = this.state.recipes.slice();
     recipes[currentIndex] = {recipeName: recipes[currentIndex].recipeName, ingredients: ingredients}
     this.setState({recipes})
@@ -81,9 +82,13 @@ class App extends Component {
 
   render() {
     const { recipes, newestRecipe, currentIndex} = this.state;
+    const noItems = recipes.length === 0;
+    console.log(recipes);
+
     return (
       <div className="App container">
-      <div>
+      { noItems ? <p>You don't have any recipes</p> : (
+      <div> 
        <PanelGroup accordion
                     id="accordion" 
                 >
@@ -99,15 +104,17 @@ class App extends Component {
                 ))}
                 </ul>
                 <ButtonToolbar>
-                  <Button bsStyle="danger" onClick={()=>this.deleteRecipeAt(index)}>Delete Recipe</Button>
-                  <Button bsStyle="default" onClick={()=>this.open("showEdit", currentIndex)}>Edit Recipe</Button>
+                  <Button bsStyle="danger" onClick={(e)=>this.deleteRecipeAt(index)}>Delete Recipe</Button>
+                  <Button bsStyle="default" onClick={(e)=>this.open("showEdit", index)}>Edit Recipe</Button>
                 </ButtonToolbar>
               </Panel.Body>
             </Panel>
           ))}
         </PanelGroup>
       </div>
-
+      )};
+    
+      <div>
             <Modal show={this.state.showAdd} onHide={this.close}>
               <Modal.Header closeButton>
                 <Modal.Title>Add Recipe</Modal.Title>
@@ -147,8 +154,8 @@ class App extends Component {
                 <FormControl
                             type="text"
                             value={recipes[currentIndex].recipeName}
-                            placeholder="Enter Recipe Name"
-                            onChange={(e)=> this.updateNewRecipe(e.target.value, newestRecipe.ingredients)}>
+                            placeholder="Enter Text"
+                            onChange={(e)=> this.updateRecipeName(e.target.value, currentIndex)}>
                 </FormControl>
               </FormGroup>
               <FormGroup controlId="formControlsTextArea">
@@ -157,7 +164,7 @@ class App extends Component {
                            type="textarea"
                             value={recipes[currentIndex].ingredients}
                             placeholder="Enter ingredients (separate by commas)"
-                            onChange={(e)=> this.updateNewRecipe(newestRecipe.recipeName, e.target.value.split(","))}
+                            onChange={(e)=> this.updateIngredients(e.target.value.split(","), currentIndex)}
                             >
                 </FormControl>
               </FormGroup>
@@ -167,8 +174,8 @@ class App extends Component {
             </Modal.Footer>
           </Modal.Header>
         </Modal>
-
-        <Button bsStyle="primary" onClick={()=> this.open("showAdd")}>Add Recipe</Button>
+      </div>
+        <Button bsStyle="primary" onClick={()=> this.open("showAdd", currentIndex)}>Add Recipe</Button>
       </div>
     );
 }
