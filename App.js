@@ -1,18 +1,23 @@
 import React, { Component } from 'react';
 import './App.css';
 import PanelGroup from 'react-bootstrap/lib/PanelGroup';
-import Accordion from 'react-bootstrap/lib/Accordion';
 import Panel from 'react-bootstrap/lib/Panel';
 import Button from 'react-bootstrap/lib/Button';
 import ButtonToolbar from 'react-bootstrap/lib/ButtonToolbar';
 import Modal from 'react-bootstrap/lib/Modal';
 import ControlLabel from 'react-bootstrap/lib/ControlLabel';
 import FormControl from 'react-bootstrap/lib/FormControl';
+import FormGroup from 'react-bootstrap/lib/FormGroup';
+//54:00 if there are no recipes it won't crash but throw error message
 
 class App extends Component {
 
   state = {
-   recipes: [
+    showAdd: false,
+    showEdit: false,
+    currentIndex: 0,
+    newestRecipe: {recipeName: "", ingredients: []},
+    recipes: [
       {
         recipeName: "tacos",
         ingredients: ["beans", "onion", "broccoli"]
@@ -27,16 +32,58 @@ class App extends Component {
       }
     ]
   };
+  //deletes a recipe
   deleteRecipeAt = index => { 
     let recipes = this.state.recipes.slice();
     recipes.splice(index, 1);
     this.setState({recipes});
-    };
-  
+    }
+  updateNewRecipe = (recipeName, ingredients) => {
+    this.setState({
+      newestRecipe: {recipeName: recipeName, ingredients: ingredients}
+    })
+  }
+  //closes a modal
+  close = () => {
+    if (this.state.showAdd) {
+      this.setState({showAdd: false}); 
+    } else if (this.state.showEdit) {
+      this.setState({showEdit: false})
+    }
+  }
+  //open a modal
+  open = (state, currentIndex) => {
+    this.setState({[state]: true });
+    this.setState({currentIndex})
+  }
+  //saves a new recipe to recipes
+  saveNewRecipe = () => {
+    let recipes = this.state.recipes.slice();
+    recipes.push({recipeName: this.state.newestRecipe.recipeName, ingredients: this.state.newestRecipe.ingredients});
+    this.setState({
+      recipes,
+     newestRecipe: {recipeName: "", ingredients: []},
+    });
+    this.close();
+  }
+  //updates recipe name
+  updatesRecipeName = (recipeName, currentIndex) => {
+    let recipes = this.state.recipes.slice();
+    recipes[currentIndex] = {recipeName: recipeName, ingredients: recipes[currentIndex].ingredients};
+    this.setState({recipes});
+  }
+  //updates ingredients
+  updatesIngredients = (ingredients, currentIndex) => {
+    let recipes = this.state.recipes.slice();
+    recipes[currentIndex] = {recipeName: recipes[currentIndex].recipeName, ingredients: ingredients}
+    this.setState({recipes})
+  }
+
   render() {
-    const {recipes} = this.state;
+    const { recipes, newestRecipe, currentIndex} = this.state;
     return (
       <div className="App container">
+      <div>
        <PanelGroup accordion
                     id="accordion" 
                 >
@@ -53,16 +100,78 @@ class App extends Component {
                 </ul>
                 <ButtonToolbar>
                   <Button bsStyle="danger" onClick={()=>this.deleteRecipeAt(index)}>Delete Recipe</Button>
-                  <Button bsStyle="default">Edit Recipe</Button>
+                  <Button bsStyle="default" onClick={()=>this.open("showEdit", currentIndex)}>Edit Recipe</Button>
                 </ButtonToolbar>
               </Panel.Body>
             </Panel>
           ))}
         </PanelGroup>
-        <Button bsStyle="primary">Add Recipe</Button>
+      </div>
+
+            <Modal show={this.state.showAdd} onHide={this.close}>
+              <Modal.Header closeButton>
+                <Modal.Title>Add Recipe</Modal.Title>
+                <Modal.Body>
+                  <FormGroup controlId="formBasicText">
+                    <ControlLabel>Recipe Name</ControlLabel>
+                    <FormControl
+                                type="text"
+                                value={newestRecipe.recipeName}
+                                placeholder="Enter Recipe Name"
+                                onChange={(e)=> this.updateNewRecipe(e.target.value, newestRecipe.ingredients)}>
+                    </FormControl>
+                  </FormGroup>
+                  <FormGroup controlId="formControlsTextArea">
+                    <ControlLabel>Ingredients</ControlLabel>
+                    <FormControl
+                               type="textarea"
+                                value={newestRecipe.ingredients}
+                                placeholder="Enter ingredients (separate by commas)"
+                                onChange={(e)=> this.updateNewRecipe(newestRecipe.recipeName, e.target.value.split(","))}
+                                >
+                    </FormControl>
+                  </FormGroup>
+                </Modal.Body>
+                <Modal.Footer>
+                  <Button bsStyle="primary" onClick={()=> this.saveNewRecipe()}>Save</Button>
+                </Modal.Footer>
+              </Modal.Header>
+            </Modal>
+
+        <Modal show={this.state.showEdit} onHide={this.close}>
+          <Modal.Header closeButton>
+            <Modal.Title>Add Recipe</Modal.Title>
+            <Modal.Body>
+              <FormGroup controlId="formBasicText">
+                <ControlLabel>Recipe Name</ControlLabel>
+                <FormControl
+                            type="text"
+                            value={recipes[currentIndex].recipeName}
+                            placeholder="Enter Recipe Name"
+                            onChange={(e)=> this.updateNewRecipe(e.target.value, newestRecipe.ingredients)}>
+                </FormControl>
+              </FormGroup>
+              <FormGroup controlId="formControlsTextArea">
+                <ControlLabel>Ingredients</ControlLabel>
+                <FormControl
+                           type="textarea"
+                            value={recipes[currentIndex].ingredients}
+                            placeholder="Enter ingredients (separate by commas)"
+                            onChange={(e)=> this.updateNewRecipe(newestRecipe.recipeName, e.target.value.split(","))}
+                            >
+                </FormControl>
+              </FormGroup>
+            </Modal.Body>
+            <Modal.Footer>
+              <Button bsStyle="primary" onClick={()=> this.saveNewRecipe()}>Save</Button>
+            </Modal.Footer>
+          </Modal.Header>
+        </Modal>
+
+        <Button bsStyle="primary" onClick={()=> this.open("showAdd")}>Add Recipe</Button>
       </div>
     );
-  }
 }
-
+}
 export default App;
+
