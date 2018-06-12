@@ -19,7 +19,7 @@ class App extends Component {
     newestRecipe: {recipeName: "", ingredients: []},
     recipes: 
     [
-     /* {
+   /*   {
         recipeName: "tacos",
         ingredients: ["beans", "onion", "broccoli"]
       },
@@ -37,6 +37,7 @@ class App extends Component {
   deleteRecipeAt = index => { 
     let recipes = this.state.recipes.slice();
     recipes.splice(index, 1);
+    localStorage.setItem('recipes', JSON.stringify(recipes));
     this.setState({recipes});
     }
   updateNewRecipe = (recipeName, ingredients) => {
@@ -61,6 +62,7 @@ class App extends Component {
   saveNewRecipe = () => {
     let recipes = this.state.recipes.slice();
     recipes.push({recipeName: this.state.newestRecipe.recipeName, ingredients: this.state.newestRecipe.ingredients});
+    localStorage.setItem('recipes', JSON.stringify(recipes));
     this.setState({
       recipes,
      newestRecipe: {recipeName: "", ingredients: []},
@@ -71,24 +73,28 @@ class App extends Component {
   updateRecipeName = (recipeName, currentIndex) => {
     let recipes = this.state.recipes.slice();
     recipes[currentIndex] = {recipeName: recipeName, ingredients: recipes[currentIndex].ingredients};
+    localStorage.setItem('recipes', JSON.stringify(recipes));
     this.setState({recipes});
   }
   //updates ingredients
   updateIngredients = (ingredients, currentIndex) => {
     let recipes = this.state.recipes.slice();
     recipes[currentIndex] = {recipeName: recipes[currentIndex].recipeName, ingredients: ingredients}
+    localStorage.setItem('recipes', JSON.stringify(recipes));
     this.setState({recipes})
   }
+  componentDidMount() {
+  let recipes = JSON.parse(localStorage.getItem("recipes")) || [];
+  this.setState({ recipes })
+  }
+
 
   render() {
     const { recipes, newestRecipe, currentIndex} = this.state;
-    const noItems = recipes.length === 0;
-    console.log(recipes);
-
     return (
       <div className="App container">
-      { noItems ? <p>You don't have any recipes</p> : (
-      <div> 
+      {recipes.length > 0 && (
+      <div>
        <PanelGroup accordion
                     id="accordion" 
                 >
@@ -111,10 +117,39 @@ class App extends Component {
             </Panel>
           ))}
         </PanelGroup>
-      </div>
-      )};
-    
-      <div>
+
+            <Modal show={this.state.showEdit} onHide={this.close}>
+              <Modal.Header closeButton>
+                <Modal.Title>Edit Recipe</Modal.Title>
+                <Modal.Body>
+                  <FormGroup controlId="formBasicText">
+                    <ControlLabel>Recipe Name</ControlLabel>
+                    <FormControl
+                                type="text"
+                                value={recipes[currentIndex].recipeName}
+                                placeholder="Enter Text"
+                                onChange={(e)=> this.updateRecipeName(e.target.value, currentIndex)}>
+                    </FormControl>
+                  </FormGroup>
+                  <FormGroup controlId="formControlsTextArea">
+                    <ControlLabel>Ingredients</ControlLabel>
+                    <FormControl
+                               type="textarea"
+                                value={recipes[currentIndex].ingredients}
+                                placeholder="Enter ingredients (separate by commas)"
+                                onChange={(e)=> this.updateIngredients(e.target.value.split(","), currentIndex)}
+                                >
+                    </FormControl>
+                  </FormGroup>
+                </Modal.Body>
+                <Modal.Footer>
+                  <Button bsStyle="primary" onClick={()=> this.saveNewRecipe()}>Save</Button>
+                </Modal.Footer>
+              </Modal.Header>
+            </Modal>
+          </div>
+      )}
+          <div>
             <Modal show={this.state.showAdd} onHide={this.close}>
               <Modal.Header closeButton>
                 <Modal.Title>Add Recipe</Modal.Title>
@@ -145,35 +180,6 @@ class App extends Component {
               </Modal.Header>
             </Modal>
 
-        <Modal show={this.state.showEdit} onHide={this.close}>
-          <Modal.Header closeButton>
-            <Modal.Title>Add Recipe</Modal.Title>
-            <Modal.Body>
-              <FormGroup controlId="formBasicText">
-                <ControlLabel>Recipe Name</ControlLabel>
-                <FormControl
-                            type="text"
-                            value={recipes[currentIndex].recipeName}
-                            placeholder="Enter Text"
-                            onChange={(e)=> this.updateRecipeName(e.target.value, currentIndex)}>
-                </FormControl>
-              </FormGroup>
-              <FormGroup controlId="formControlsTextArea">
-                <ControlLabel>Ingredients</ControlLabel>
-                <FormControl
-                           type="textarea"
-                            value={recipes[currentIndex].ingredients}
-                            placeholder="Enter ingredients (separate by commas)"
-                            onChange={(e)=> this.updateIngredients(e.target.value.split(","), currentIndex)}
-                            >
-                </FormControl>
-              </FormGroup>
-            </Modal.Body>
-            <Modal.Footer>
-              <Button bsStyle="primary" onClick={()=> this.saveNewRecipe()}>Save</Button>
-            </Modal.Footer>
-          </Modal.Header>
-        </Modal>
       </div>
         <Button bsStyle="primary" onClick={()=> this.open("showAdd", currentIndex)}>Add Recipe</Button>
       </div>
