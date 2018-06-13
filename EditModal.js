@@ -32,7 +32,7 @@ const EditModal = props =>
               </FormGroup>
             </Modal.Body>
             <Modal.Footer>
-              <Button bsStyle="primary" onClick={()=> props.saveNewRecipe()}>Save</Button>
+              <Button bsStyle="primary" onClick={()=> props.close()}>Save</Button>
             </Modal.Footer>
           </Modal.Header>
         </Modal>

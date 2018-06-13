@@ -96,6 +96,7 @@ class App extends Component {
           <Button bsStyle="primary" onClick={()=> this.open("showAdd", currentIndex)}>Add Recipe</Button>
 
         <ShowAddModal showAdd={this.state.showAdd}
+                    updateNewRecipe={this.updateNewRecipe}
                     newestRecipe={newestRecipe}
                     recipes={recipes}
                     updateRecipeName={this.updateRecipeName}
@@ -123,6 +124,7 @@ class App extends Component {
         <ShowAddModal showAdd={this.state.showAdd}
                     newestRecipe={newestRecipe}
                     recipes={recipes}
+                    updateNewRecipe={this.updateNewRecipe}
                     updateRecipeName={this.updateRecipeName}
                     updateIngredients={this.updateIngredients}
                     saveNewRecipe={this.saveNewRecipe}
