@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import './App.css';
-import Button from 'react-bootstrap/lib/Button';
-
+import NavComponent from './NavComponent';
 import Accordion from './Accordion';
 import EditModal from './EditModal';
 import ShowAddModal from './ShowAddModal';
@@ -14,22 +13,8 @@ class App extends Component {
     showEdit: false,
     currentIndex: 0,
     newestRecipe: {recipeName: "", ingredients: []},
-    recipes: 
-    [
-   /*   {
-        recipeName: "tacos",
-        ingredients: ["beans", "onion", "broccoli"]
-      },
-      {
-        recipeName: "fish pudding",
-        ingredients: ["eggs", "gluten", "more gluten"]
-      },
-      {
-        recipeName: "arm",
-        ingredients : ["tendon", "blood", "muscle"]
-      }*/
-    ]
-  };
+    recipes: []
+  }
   //deletes a recipe
   deleteRecipeAt = index => { 
     let recipes = this.state.recipes.slice();
@@ -37,6 +22,7 @@ class App extends Component {
     localStorage.setItem('recipes', JSON.stringify(recipes));
     this.setState({recipes});
     }
+  //updates with a new recipe
   updateNewRecipe = (recipeName, ingredients) => {
     this.setState({
       newestRecipe: {recipeName: recipeName, ingredients: ingredients}
@@ -80,20 +66,25 @@ class App extends Component {
     localStorage.setItem('recipes', JSON.stringify(recipes));
     this.setState({recipes})
   }
+  //for local storage
   componentDidMount() {
   let recipes = JSON.parse(localStorage.getItem("recipes")) || [];
   this.setState({ recipes })
   }
-
+  handleSelect(){
+    console.log("handleSelect");
+  }
 
   render() {
     const { recipes, newestRecipe, currentIndex} = this.state;
     return (
       (recipes.length === 0) ? (
       
-        <div> 
-          <h3>You have no recipes</h3>
-          <Button bsStyle="primary" onClick={()=> this.open("showAdd", currentIndex)}>Add Recipe</Button>
+        <div className="App container"> 
+          <NavComponent handleSelect={this.handleSelect}
+                        open={this.open}
+                        currentIndex={currentIndex}/>
+          <p>You have no recipes</p>
 
         <ShowAddModal showAdd={this.state.showAdd}
                     updateNewRecipe={this.updateNewRecipe}
@@ -108,6 +99,10 @@ class App extends Component {
 
       ) : (
       <div className="App container">
+        <NavComponent handleSelect={this.handleSelect}
+                        open={this.open}
+                        currentIndex={currentIndex}/>
+
         <Accordion recipes={this.state.recipes}
                     deleteRecipeAt={this.deleteRecipeAt}
                     open={this.open}
@@ -131,7 +126,6 @@ class App extends Component {
                     close={this.close}
                     currentIndex={this.state.currentIndex}/>
       
-        <Button bsStyle="primary" onClick={()=> this.open("showAdd", currentIndex)}>Add Recipe</Button>
       
     </div>
     )

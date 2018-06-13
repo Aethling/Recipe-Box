@@ -21,7 +21,7 @@ const EditModal = props =>
                 </FormControl>
               </FormGroup>
               <FormGroup controlId="formControlsTextArea">
-                <ControlLabel>Ingredients</ControlLabel>
+                <ControlLabel>Ingredients (seperated by commas)</ControlLabel>
                 <FormControl
                            type="textarea"
                             value={props.recipes[props.currentIndex].ingredients}
